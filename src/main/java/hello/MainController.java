@@ -1,6 +1,7 @@
 package hello;
 
-import hello.repository.DocumentWithTextPagesRepository;
+import hello.pojo.selectors.Selector;
+import hello.repository.SelectorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,17 +19,19 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 @RestController
 public class MainController {
 
+
     @Autowired
-    DocumentWithTextPagesRepository documentWithTextPagesRepository;
+    SelectorRepository selectorRepository;
 
-
-
-
-
+    @RequestMapping(value = "/selectors", method = RequestMethod.GET)
+    public List<Selector> getSelectors(){
+        return selectorRepository.findAll();
+    }
 
 
 
