@@ -1,5 +1,7 @@
 package hello;
 
+import hello.repository.DocumentWithTextPagesRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,14 +20,29 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @RestController
-public class GreetingController {
+public class MainController {
+
+    @Autowired
+    DocumentWithTextPagesRepository documentWithTextPagesRepository;
 
 
-    @RequestMapping(value = "/image/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
+
+
+
+
+
+
+
+
+    /**
+     * Next two methods for Angular images and pdf view
+     * **/
+
+    @RequestMapping(value = "/image/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] getImage(@PathVariable("id") Integer id) throws IOException {
-        BufferedImage originalImage = ImageIO.read(new File("D:\\pdf\\copy\\2k14acadia\\IMG\\"+id+".jpg"));
+        BufferedImage originalImage = ImageIO.read(new File("D:\\pdf\\copy\\2k14acadia\\IMG\\"+id+".png"));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write( originalImage, "jpg", baos );
+        ImageIO.write( originalImage, "png", baos );
         baos.flush();
         return  baos.toByteArray();
     }
