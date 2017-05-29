@@ -29,9 +29,10 @@ public class MainController {
     @Autowired
     FileService fileService;
     @RequestMapping(value = "/documents/store", method = RequestMethod.POST)
-    public String handleFileUpload(@RequestParam("file") MultipartFile file) {
+    public String handleFileUpload(@RequestParam MultipartFile file) {
+        System.out.println(file.getName()+"\n\n\n\n\n\n");
         fileService.store(file);
-        return "File " + file.getOriginalFilename() + " upload success";
+        return "{response: \"All is OKAY\"}";
     }
 
 

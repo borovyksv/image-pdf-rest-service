@@ -1,5 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {SelectorsService} from "./selectors.service";
+import {Observable} from "rxjs/Observable";
+import {Http, RequestOptions, Headers} from "@angular/http";
+import 'rxjs/add/operator/toPromise';
+
 
 
 
@@ -15,7 +19,24 @@ export class AppComponent implements OnInit{
   selector: Selector;
 
   // upload a file
-  
+  fileChange(event) {
+    let fileList: FileList = event.target.files;
+    if(fileList.length > 0) {
+      let file: File = fileList[0];
+      let formData = new FormData();
+      formData.append('file', file);
+      // let headers = new Headers();
+      // headers.append('Content-Type', 'multipart/form-data');
+      // headers.append('Accept', 'application/json');
+      // headers.append('boundary', 'some text');
+
+      // let options = new RequestOptions({ headers: headers });
+      this.http.post(`http://localhost:8080/documents/store`, formData)
+        .toPromise()
+        .then(res => res.json())
+        .catch(error => console.log(error));
+    }
+  }
 
 
 
@@ -35,7 +56,7 @@ export class AppComponent implements OnInit{
 
 
 
-  constructor(private selectorsService: SelectorsService) {}
+  constructor(private http: Http, private selectorsService: SelectorsService) {}
 
 
   ngOnInit():void {
