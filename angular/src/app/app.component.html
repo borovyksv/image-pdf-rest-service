@@ -1,0 +1,60 @@
+<body>
+<nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header"><a class="navbar-brand navbar-link" href="#"><i class="fa fa-file-pdf-o"></i> PDF Dashboard</a>
+      <button class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span>
+        <span class="icon-bar"></span><span class="icon-bar"></span></button>
+    </div>
+    <div class="collapse navbar-collapse" id="navcol-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li role="presentation"><a href="#">Item</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="container">
+  <form class="bootstrap-form-with-validation">
+    <h2 class="text-center">Upload document</h2>
+    <div class="row">
+      <div class="col-md-3" *ngFor="let selector of selectors">
+        <h4 class="text-center">{{selector.title}}</h4>
+        <select class="form-control">
+            <option *ngFor="let value of selector.options" value="value">{{value}}</option>
+        </select>
+      </div>
+    </div>
+    <h3 class="text-center">Extra notes</h3>
+    <input class="form-control" type="text">
+    <div class="form-group">
+      <label class="control-label" for="file-input">File Input</label>
+      <input type="file" name="file-input" id="file-input"
+             (change)="fileChange($event)" placeholder="Upload file" accept=".pdf">
+    </div>
+    <div class="form-group">
+      <button class="btn btn-primary" type="submit">Upload</button>
+    </div>
+  </form>
+</div>
+<div class="container">
+  <h2 class="text-center">New selector</h2>
+  <div class="row">
+    <div class="col-md-12 col-md-offset-3">
+      <form (ngSubmit)="onAddSubmit()" #rawSelectorForm="ngForm" class="form-inline bootstrap-form-with-validation">
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input type="text" name="title" id="title" placeholder="Title" class="form-control" required
+                 [(ngModel)]="rawSelector.title"/>
+        </div>
+        <div class="form-group">
+          <label for="options">Options</label>
+          <input type="text" name="options" placeholder="option1, option2, ..." class="form-control" required
+                 [(ngModel)]="rawSelector.options"/>
+        </div>
+        <button class="btn btn-succes" type="submit">ADD </button>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="assets/js/jquery.min.js"></script>
+<script src="assets/bootstrap/js/bootstrap.min.js"></script>
+</body>
