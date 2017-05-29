@@ -1,13 +1,13 @@
 package hello;
 
+import hello.pojo.selectors.RawSelector;
 import hello.pojo.selectors.Selector;
 import hello.repository.SelectorRepository;
+import hello.services.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +19,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -26,11 +27,31 @@ public class MainController {
 
 
     @Autowired
+    FileService fileService;
+    @RequestMapping(value = "/documents/store", method = RequestMethod.POST)
+    public String handleFileUpload(@RequestParam("file") MultipartFile file) {
+        fileService.store(file);
+        return "File " + file.getOriginalFilename() + " upload success";
+    }
+
+
+    /**
+     * Methods to work with selectors
+     * */
+    @Autowired
     SelectorRepository selectorRepository;
 
     @RequestMapping(value = "/selectors", method = RequestMethod.GET)
     public List<Selector> getSelectors(){
         return selectorRepository.findAll();
+    }
+
+    @RequestMapping(value = "/selectors", method = RequestMethod.POST)
+    public void addSelector(@RequestBody RawSelector input){
+        System.out.println(input);
+
+        Selector saved = selectorRepository.save(new Selector(input.getTitle(), Arrays.asList(input.getOptions().split(", "))));
+        System.out.println("saved " + saved);
     }
 
 
