@@ -32,7 +32,7 @@ public class MainController {
     public String handleFileUpload(@RequestParam MultipartFile file) {
         System.out.println(file.getName()+"\n\n\n\n\n\n");
         fileService.store(file);
-        return "{response: \"All is OKAY\"}";
+        return file.getOriginalFilename();
     }
 
 

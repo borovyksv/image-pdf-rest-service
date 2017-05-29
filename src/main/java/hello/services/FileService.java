@@ -15,7 +15,11 @@ public class FileService {
 
     public void store(MultipartFile file) {
         try {
-            Files.copy(file.getInputStream(), Paths.get(uploadFileStorage).resolve(file.getOriginalFilename()));
+            if (Files.exists(Paths.get(uploadFileStorage + file.getOriginalFilename()))) {
+                System.out.println("File: " + file.getOriginalFilename() + " exists");
+            } else {
+                Files.copy(file.getInputStream(), Paths.get(uploadFileStorage).resolve(file.getOriginalFilename()));
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
