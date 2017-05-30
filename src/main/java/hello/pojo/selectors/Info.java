@@ -1,10 +1,6 @@
 package hello.pojo.selectors;
 
-import org.springframework.data.annotation.Id;
-
 public class Info {
-    @Id
-    public String id;
     public String title;
     public String options;
 
@@ -16,13 +12,6 @@ public class Info {
         this.options = options;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getTitle() {
         return title;
@@ -43,8 +32,7 @@ public class Info {
     @Override
     public String toString() {
         return "Info{" +
-                "id='" + id + '\'' +
-                ", title='" + title + '\'' +
+                "title='" + title + '\'' +
                 ", options='" + options + '\'' +
                 '}';
     }

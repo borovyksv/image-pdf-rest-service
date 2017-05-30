@@ -1,8 +1,10 @@
 package hello;
 
+import hello.pojo.DocumentWithTextPages;
 import hello.pojo.selectors.Info;
 import hello.pojo.selectors.RawSelector;
 import hello.pojo.selectors.Selector;
+import hello.repository.DocumentWithTextPagesRepository;
 import hello.repository.SelectorRepository;
 import hello.services.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +29,21 @@ import java.util.List;
 public class MainController {
 
 
+    /**FILE UPLOAD*/
+    @Autowired
+    DocumentWithTextPagesRepository documentWithTextPagesRepository;
     @Autowired
     FileService fileService;
     @RequestMapping(value = "/documents/store", method = RequestMethod.POST, consumes = "multipart/form-data")
-    public String handleFileUpload(@RequestPart("file") MultipartFile file, @RequestPart("info") Info[] info) {
+    public Info handleFileUpload(@RequestPart("file") MultipartFile file, @RequestPart("info") List<Info> info) {
         System.out.println(file.getName()+"\n\n\n\n\n\n");
-        System.out.println("INFO to string "+ Arrays.toString(info) +"\n\n\n\n\n\n");
-        fileService.store(file);
-        return file.getOriginalFilename();
+        System.out.println("INFO to string "+ info +"\n\n\n\n\n\n");
+        if (fileService.store(file)){
+
+            DocumentWithTextPages document = new DocumentWithTextPages(file.getOriginalFilename(), info);
+            documentWithTextPagesRepository.save(document);
+        }
+        return new Info("message", "File "+file.getOriginalFilename()+" uploaded");
     }
 
 

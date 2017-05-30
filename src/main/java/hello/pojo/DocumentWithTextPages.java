@@ -1,5 +1,6 @@
 package hello.pojo;
 
+import hello.pojo.selectors.Info;
 import org.springframework.data.annotation.Id;
 
 import java.util.List;
@@ -11,7 +12,14 @@ public class DocumentWithTextPages {
     public String id;
 
     public String name;
+    public List<Info> options;
     public List<Page> pages;
+
+    public DocumentWithTextPages(String name, List<Info> options) {
+        this.name = name;
+        this.options = options;
+        this.pages = pages;
+    }
 
     public DocumentWithTextPages(List<Page> pages, String name) {
         this.pages = pages;
@@ -20,6 +28,14 @@ public class DocumentWithTextPages {
 
     public DocumentWithTextPages() {
 
+    }
+
+    public List<Info> getOptions() {
+        return options;
+    }
+
+    public void setOptions(List<Info> options) {
+        this.options = options;
     }
 
     @Override

@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Service
@@ -13,16 +14,20 @@ public class FileService {
     @Value("${upload.file.storage}")
     private String uploadFileStorage;
 
-    public void store(MultipartFile file) {
+    public boolean store(MultipartFile file) {
+        Path target = Paths.get(uploadFileStorage).resolve(file.getOriginalFilename());
         try {
-            if (Files.exists(Paths.get(uploadFileStorage + file.getOriginalFilename()))) {
+            if (Files.exists(target)) {
                 System.out.println("File: " + file.getOriginalFilename() + " exists");
+                return false;
             } else {
-                Files.copy(file.getInputStream(), Paths.get(uploadFileStorage).resolve(file.getOriginalFilename()));
+                Files.copy(file.getInputStream(), target);
+                return true;
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        return false;
     }
 }

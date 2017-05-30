@@ -19,13 +19,12 @@ export class AppComponent implements OnInit {
   // upload a file
   fileList:FileList;
   activeSelectors:RawSelector[]=[new RawSelector("", "")];
-  selectedValue:string="empty";
 
   // todo: remove this
   get diagnostic() { return JSON.stringify(this.activeSelectors); }
 
   changeActiveSelectorValue(title:string, value:string) {
-    let index=-1;
+    
     if (this.activeSelectors.some(x => x.title === title)) {
       for (let i in this.activeSelectors) {
         if (this.activeSelectors[i].title == title) {
@@ -34,6 +33,7 @@ export class AppComponent implements OnInit {
         }
       }
     } else this.activeSelectors.push(new RawSelector(title, value))
+    
   }
 
   fileChange(event) {
@@ -55,7 +55,7 @@ export class AppComponent implements OnInit {
       let options = new RequestOptions({ headers: headers });
       this.http.post("http://localhost:8080//documents/store",formData, options)
         .toPromise()
-        .then(res => res.json())
+        .then(res => console.log(res.json()))
         .catch(error => console.log(error));
     }
   }
