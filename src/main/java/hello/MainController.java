@@ -1,5 +1,6 @@
 package hello;
 
+import hello.pojo.selectors.Info;
 import hello.pojo.selectors.RawSelector;
 import hello.pojo.selectors.Selector;
 import hello.repository.SelectorRepository;
@@ -28,9 +29,10 @@ public class MainController {
 
     @Autowired
     FileService fileService;
-    @RequestMapping(value = "/documents/store", method = RequestMethod.POST)
-    public String handleFileUpload(@RequestParam MultipartFile file) {
+    @RequestMapping(value = "/documents/store", method = RequestMethod.POST, consumes = "multipart/form-data")
+    public String handleFileUpload(@RequestPart("file") MultipartFile file, @RequestPart("info") Info[] info) {
         System.out.println(file.getName()+"\n\n\n\n\n\n");
+        System.out.println("INFO to string "+ Arrays.toString(info) +"\n\n\n\n\n\n");
         fileService.store(file);
         return file.getOriginalFilename();
     }
