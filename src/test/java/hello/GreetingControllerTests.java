@@ -27,6 +27,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,9 +45,17 @@ public class GreetingControllerTests {
         String vehicle = "Toyota";
         String keyword = "water pump";
 
+        Instant start = Instant.now();
+
         List<DocumentWithTextPages> search = documentWithTextPagesRepository.search(vehicle.toUpperCase(), keyword);
-        System.out.println(search.size());
+
+        Instant end = Instant.now();
+        System.out.println("QUERY DOCUMENTS TIME: "+ Duration.between(start, end));
+
         List<DocumentWithTextPages> result = new ArrayList<>();
+
+
+        start = Instant.now();
         for (DocumentWithTextPages documentWithTextPages : search) {
             DocumentWithTextPages document = new DocumentWithTextPages();
             document.setName(documentWithTextPages.getName());
@@ -63,6 +73,8 @@ public class GreetingControllerTests {
 
             result.add(document);
         }
+        end = Instant.now();
+        System.out.println("FILTERING DOCUMENTS TIME: "+ Duration.between(start, end));
     }
 
     private List<Page> filterList(List<Page> pages, String keyword) {
