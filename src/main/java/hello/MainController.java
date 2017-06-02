@@ -3,6 +3,8 @@ package hello;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import hello.pojo.DocumentWithTextPages;
 import hello.pojo.Page;
+import hello.pojo.search.SearchDocument;
+import hello.pojo.search.SearchPage;
 import hello.pojo.selectors.RawSelector;
 import hello.pojo.selectors.Selector;
 import hello.repository.DocumentWithTextPagesRepository;
@@ -37,7 +39,8 @@ public class MainController {
 
     /**Search*/
     @RequestMapping(value = "/documents/{vehicle}/{keyword}", method = RequestMethod.GET)
-    public List<DocumentWithTextPages> search(@PathVariable( "vehicle" ) String vehicle, @PathVariable( "keyword" ) String keyword) throws JsonProcessingException {
+    public List<SearchDocument> search(@PathVariable( "vehicle" ) String vehicle, @PathVariable( "keyword" ) String keyword) throws JsonProcessingException {
+
         Instant start = Instant.now();
 
         List<DocumentWithTextPages> search = documentWithTextPagesRepository.search(vehicle.toUpperCase(), keyword);
@@ -45,49 +48,84 @@ public class MainController {
         Instant end = Instant.now();
         System.out.println("QUERY DOCUMENTS TIME: "+ Duration.between(start, end));
 
-        List<DocumentWithTextPages> result = new ArrayList<>();
+
+
+        return getSearchDocuments(keyword, search);
+    }
+
+    private List<SearchDocument> getSearchDocuments(String keyword, List<DocumentWithTextPages> search) {
+        Instant start;
+        Instant end;
+        List<SearchDocument> result = new ArrayList<>();
 
 
         start = Instant.now();
+
         for (DocumentWithTextPages documentWithTextPages : search) {
-            DocumentWithTextPages document = new DocumentWithTextPages();
+            SearchDocument document = new SearchDocument();
             document.setName(documentWithTextPages.getName());
             document.setOptions(documentWithTextPages.getOptions());
 
             List<Page> bookmarks = documentWithTextPages.getBookmarks();
-            List<Page> newBookmarks = filterList(bookmarks, keyword);
+            List<SearchPage> newBookmarks = filterList(bookmarks, keyword);
             document.setBookmarks(newBookmarks);
 
             List<Page> pages = documentWithTextPages.getPages();
-            List<Page> newPages = filterList(pages, keyword);
+            List<SearchPage> newPages = filterList(pages, keyword);
             document.setPages(newPages);
+
+            document.setMatches(countMatches(newBookmarks, newPages));
 
 //            System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(document));
 
             result.add(document);
         }
-        end = Instant.now();
-        System.out.println("FILTERING DOCUMENTS TIME: "+ Duration.between(start, end));
 
+        end = Instant.now();
+
+        System.out.println("FILTERING DOCUMENTS TIME: "+ Duration.between(start, end));
         return result;
     }
 
-    private List<Page> filterList(List<Page> pages, String keyword) {
-        return pages.parallelStream().filter(page -> page.getText().toLowerCase().contains(keyword.toLowerCase())).map(page -> {
-            if (page.getId()==307){
-                System.out.println("Hello");
-            }
-            String text = page.getText().toLowerCase();
-            int i = text.indexOf(keyword.toLowerCase());
-            int startPos = (i - 20) < 0 ? 0 : (i - 20);
-            int endPos = (i +keyword.length()+ 20) > text.length() ? text.length() : (i + keyword.length()+20);
-            String substring = page.getText().substring(startPos, endPos);
-            page.setText(substring);
-            return page;
-        }).collect(Collectors.toList());
+    private Integer countMatches(List<SearchPage> newBookmarks, List<SearchPage> newPages) {
+        final Integer[] result = {0};
+
+        newBookmarks.forEach(page -> result[0] +=page.getMatches());
+        newPages.forEach(page -> result[0] +=page.getMatches());
+
+        return result[0];
     }
 
+    private List<SearchPage> filterList(List<Page> pages, String keyword) {
+        return pages.parallelStream().filter(page -> page.getText().toLowerCase().contains(keyword.toLowerCase())).map(page -> {
 
+            String text = page.getText().toLowerCase();
+            String lowerKeyword = keyword.toLowerCase();
+
+            int index = text.indexOf(lowerKeyword);
+            int startPos = (index - 20) < 0 ? 0 : (index - 20);
+            int endPos = (index + keyword.length() + 20) > text.length() ? text.length() : (index + keyword.length() + 20);
+            String substring = page.getText().substring(startPos, endPos);
+
+            int counter = 1;
+            index = index + keyword.length();
+            int length = text.length();
+            while (index < length) {
+                index = text.indexOf(lowerKeyword, index+keyword.length());
+                if (index==-1){
+                    break;
+                }
+                counter++;
+            }
+
+            SearchPage result = new SearchPage();
+            result.setPageNum(page.getId());
+            result.setMatches(counter);
+            result.setText(substring);
+
+            return result;
+        }).sorted((p1, p2) -> Integer.compare(p2.getMatches(), p1.getMatches())).collect(Collectors.toList());
+    }
 
 
 

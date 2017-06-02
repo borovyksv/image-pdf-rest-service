@@ -19,6 +19,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hello.pojo.DocumentWithTextPages;
 import hello.pojo.Page;
+import hello.pojo.search.SearchDocument;
+import hello.pojo.search.SearchPage;
 import hello.repository.DocumentWithTextPagesRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,21 +54,21 @@ public class GreetingControllerTests {
         Instant end = Instant.now();
         System.out.println("QUERY DOCUMENTS TIME: "+ Duration.between(start, end));
 
-        List<DocumentWithTextPages> result = new ArrayList<>();
+        List<SearchDocument> result = new ArrayList<>();
 
 
         start = Instant.now();
         for (DocumentWithTextPages documentWithTextPages : search) {
-            DocumentWithTextPages document = new DocumentWithTextPages();
+            SearchDocument document = new SearchDocument();
             document.setName(documentWithTextPages.getName());
             document.setOptions(documentWithTextPages.getOptions());
 
             List<Page> bookmarks = documentWithTextPages.getBookmarks();
-            List<Page> newBookmarks = filterList(bookmarks, keyword);
+            List<SearchPage> newBookmarks = filterList(bookmarks, keyword);
             document.setBookmarks(newBookmarks);
 
             List<Page> pages = documentWithTextPages.getPages();
-            List<Page> newPages = filterList(pages, keyword);
+            List<SearchPage> newPages = filterList(pages, keyword);
             document.setPages(newPages);
 
             System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(document));
@@ -77,19 +79,35 @@ public class GreetingControllerTests {
         System.out.println("FILTERING DOCUMENTS TIME: "+ Duration.between(start, end));
     }
 
-    private List<Page> filterList(List<Page> pages, String keyword) {
+    private List<SearchPage> filterList(List<Page> pages, String keyword) {
         return pages.stream().filter(page -> page.getText().toLowerCase().contains(keyword.toLowerCase())).map(page -> {
-                if (page.getId()==307){
-                    System.out.println("Hello");
+
+            String text = page.getText().toLowerCase();
+            String lowerKeyword = keyword.toLowerCase();
+
+            int index = text.indexOf(lowerKeyword);
+            int startPos = (index - 20) < 0 ? 0 : (index - 20);
+            int endPos = (index + keyword.length() + 20) > text.length() ? text.length() : (index + keyword.length() + 20);
+            String substring = page.getText().substring(startPos, endPos);
+
+            int counter = 1;
+            index = index + keyword.length();
+            int length = text.length();
+            while (index < length) {
+                index = text.indexOf(lowerKeyword, index+keyword.length());
+                if (index==-1){
+                    break;
                 }
-                String text = page.getText().toLowerCase();
-                int i = text.indexOf(keyword.toLowerCase());
-                int startPos = (i - 20) < 0 ? 0 : (i - 20);
-                int endPos = (i +keyword.length()+ 20) > text.length() ? text.length() : (i + keyword.length()+20);
-                String substring = page.getText().substring(startPos, endPos);
-                page.setText(substring);
-                return page;
-            }).collect(Collectors.toList());
+                counter++;
+            }
+
+            SearchPage result = new SearchPage();
+            result.setPageNum(page.getId());
+            result.setMatches(counter);
+            result.setText(substring);
+
+            return result;
+            }).sorted((p1, p2) -> Integer.compare(p2.getMatches(), p1.getMatches())).collect(Collectors.toList());
     }
 
 
