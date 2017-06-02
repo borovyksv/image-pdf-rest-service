@@ -1,7 +1,11 @@
 package hello.pojo.selectors;
 
+import org.springframework.data.mongodb.core.index.Indexed;
+
 public class Info {
+    @Indexed
     public String title;
+    @Indexed
     public String options;
 
     public Info() {

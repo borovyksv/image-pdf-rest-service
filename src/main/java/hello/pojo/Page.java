@@ -1,12 +1,12 @@
 package hello.pojo;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.TextIndexed;
 
 public class Page {
     @Id
     public Integer id;
-    @Indexed
+    @TextIndexed
     public String text;
 
     public Page(Integer id, String text) {

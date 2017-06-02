@@ -14,8 +14,8 @@ public class FileService {
     @Value("${upload.file.storage}")
     private String uploadFileStorage;
 
-    public boolean store(MultipartFile file) {
-        Path target = Paths.get(uploadFileStorage).resolve(file.getOriginalFilename());
+    public boolean store(MultipartFile file, String id) {
+        Path target = Paths.get(uploadFileStorage).resolve(id+".pdf");
         try {
             if (Files.exists(target)) {
                 System.out.println("File: " + file.getOriginalFilename() + " exists");

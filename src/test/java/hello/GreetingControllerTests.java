@@ -15,40 +15,127 @@
  */
 package hello;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import hello.pojo.DocumentWithTextPages;
+import hello.pojo.Page;
+import hello.repository.DocumentWithTextPagesRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 public class GreetingControllerTests {
-
     @Autowired
-    private MockMvc mockMvc;
+    DocumentWithTextPagesRepository documentWithTextPagesRepository;
 
     @Test
-    public void noParamGreetingShouldReturnDefaultMessage() throws Exception {
+    public void search() throws JsonProcessingException {
+        String vehicle = "Toyota";
+        String keyword = "water pump";
 
-        this.mockMvc.perform(get("/greeting")).andDo(print()).andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").value("Hello, World!"));
+        List<DocumentWithTextPages> search = documentWithTextPagesRepository.search(vehicle.toUpperCase(), keyword);
+        System.out.println(search.size());
+        List<DocumentWithTextPages> result = new ArrayList<>();
+        for (DocumentWithTextPages documentWithTextPages : search) {
+            DocumentWithTextPages document = new DocumentWithTextPages();
+            document.setName(documentWithTextPages.getName());
+            document.setOptions(documentWithTextPages.getOptions());
+
+            List<Page> bookmarks = documentWithTextPages.getBookmarks();
+            List<Page> newBookmarks = filterList(bookmarks, keyword);
+            document.setBookmarks(newBookmarks);
+
+            List<Page> pages = documentWithTextPages.getPages();
+            List<Page> newPages = filterList(pages, keyword);
+            document.setPages(newPages);
+
+            System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(document));
+
+            result.add(document);
+        }
     }
 
-    @Test
-    public void paramGreetingShouldReturnTailoredMessage() throws Exception {
+    private List<Page> filterList(List<Page> pages, String keyword) {
+        return pages.stream().filter(page -> page.getText().toLowerCase().contains(keyword.toLowerCase())).map(page -> {
+                if (page.getId()==307){
+                    System.out.println("Hello");
+                }
+                String text = page.getText().toLowerCase();
+                int i = text.indexOf(keyword.toLowerCase());
+                int startPos = (i - 20) < 0 ? 0 : (i - 20);
+                int endPos = (i +keyword.length()+ 20) > text.length() ? text.length() : (i + keyword.length()+20);
+                String substring = page.getText().substring(startPos, endPos);
+                page.setText(substring);
+                return page;
+            }).collect(Collectors.toList());
+    }
 
-        this.mockMvc.perform(get("/greeting").param("name", "Spring Community"))
-                .andDo(print()).andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").value("Hello, Spring Community!"));
+
+    @Test
+    public void savana(){
+        DocumentWithTextPages savana = documentWithTextPagesRepository.getSavana();
+        for (int i = 500; i < 1500; i++) {
+            DocumentWithTextPages doc = new DocumentWithTextPages();
+            doc.setName(savana.getName()+" "+i);
+            doc.setOptions(savana.getOptions());
+            doc.setBookmarks(savana.getBookmarks());
+            doc.setPages(savana.getPages());
+            System.out.println(doc);
+            System.out.println("count "+documentWithTextPagesRepository.count());
+            documentWithTextPagesRepository.save(doc);
+        }
+        System.out.println(savana);
+    }
+
+
+    @Test
+    public void test(){
+        for (int i = 30; i < 50; i++) {
+            List<DocumentWithTextPages> all = documentWithTextPagesRepository.findAll();
+            for (DocumentWithTextPages documentWithTextPages : all) {
+                DocumentWithTextPages doc = new DocumentWithTextPages();
+
+                doc.setName(documentWithTextPages.getName() + " " + i);
+                doc.setPages(documentWithTextPages.getPages());
+                doc.setOptions(documentWithTextPages.getOptions());
+                doc.setBookmarks(documentWithTextPages.getBookmarks());
+
+                doc.getPages().add(new Page(15000 + i, " qwerty" + i));
+
+                System.out.println(doc);
+                documentWithTextPagesRepository.save(doc);
+            }
+        }
+//        for (DocumentWithTextPages documentWithTextPages : all) {
+//            for (int i = 0; i < 300; i++) {
+//                DocumentWithTextPages document = new DocumentWithTextPages();
+//                document.setName(documentWithTextPages.getName() + " " + i);
+//                document.setBookmarks(documentWithTextPages.getBookmarks());
+//                document.setOptions(documentWithTextPages.getOptions());
+//
+//                List<Page> pages = documentWithTextPages.getPages();
+//                Page page = pages.get(10);
+//                page.setText(page.getText()+" qwerty"+i+" "+page.getText());
+//                pages.set(10, page);
+//                List<Page> pages1 = pages.subList(0, 5000);
+//
+//                document.setPages(pages1);
+//                System.out.println(document);
+//
+//                documentWithTextPagesRepository.save(document);
+//
+//            }
+//        }
     }
 
 }
