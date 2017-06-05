@@ -13,28 +13,10 @@ import 'rxjs/add/operator/toPromise';
 })
 export class AppComponent implements OnInit {
 
-  selectors:Selector[];
-  selector:Selector;
+  constructor(private http:Http, private selectorsService:SelectorsService) {}
 
   // upload a file
   fileList:FileList;
-  activeSelectors:RawSelector[]=[new RawSelector("", "")];
-
-  // todo: remove this
-  get diagnostic() { return JSON.stringify(this.activeSelectors); }
-
-  changeActiveSelectorValue(title:string, value:string) {
-    
-    if (this.activeSelectors.some(x => x.title === title)) {
-      for (let i in this.activeSelectors) {
-        if (this.activeSelectors[i].title == title) {
-          this.activeSelectors[i].options = value;
-          break;
-        }
-      }
-    } else this.activeSelectors.push(new RawSelector(title, value))
-    
-  }
 
   fileChange(event) {
     this.fileList = event.target.files;
@@ -58,12 +40,19 @@ export class AppComponent implements OnInit {
         .then(res => console.log(res.json()))
         .catch(error => console.log(error));
     }
+    this.activeSelectors=[new RawSelector("", "")];
   }
 
 
 
 
-  // Add selector form
+
+
+  // Selectors form
+  activeSelectors:RawSelector[]=[new RawSelector("", "")];
+
+  selectors:Selector[];
+  selector:Selector;
   rawSelector = new RawSelector('', '');
 
   onAddSubmit() {
@@ -75,12 +64,24 @@ export class AppComponent implements OnInit {
       return;
     }
     this.selectorsService.add(this.rawSelector);
+
   }
 
+  // todo: remove this
+  get diagnostic() { return JSON.stringify(this.activeSelectors); }
 
-  constructor(private http:Http, private selectorsService:SelectorsService) {
+  changeActiveSelectorValue(title:string, value:string) {
+
+    if (this.activeSelectors.some(x => x.title === title)) {
+      for (let i in this.activeSelectors) {
+        if (this.activeSelectors[i].title == title) {
+          this.activeSelectors[i].options = value;
+          break;
+        }
+      }
+    } else this.activeSelectors.push(new RawSelector(title, value))
+
   }
-
 
   ngOnInit():void {
     this.getSelectors();

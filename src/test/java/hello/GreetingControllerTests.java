@@ -102,7 +102,7 @@ public class GreetingControllerTests {
             }
 
             SearchPage result = new SearchPage();
-            result.setPageNum(page.getId());
+            result.setPageNum(page.getPageNum());
             result.setMatches(counter);
             result.setText(substring);
 
@@ -150,7 +150,7 @@ public class GreetingControllerTests {
 //            for (int i = 0; i < 300; i++) {
 //                DocumentWithTextPages document = new DocumentWithTextPages();
 //                document.setName(documentWithTextPages.getName() + " " + i);
-//                document.setBookmarks(documentWithTextPages.getBookmarks());
+//                document.setBookmarks(documentWithTextPages.getDocsByVehicle());
 //                document.setOptions(documentWithTextPages.getOptions());
 //
 //                List<Page> pages = documentWithTextPages.getPages();

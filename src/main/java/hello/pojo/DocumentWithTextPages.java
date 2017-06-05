@@ -1,6 +1,5 @@
 package hello.pojo;
 
-import hello.pojo.selectors.Info;
 import org.springframework.data.annotation.Id;
 
 import java.util.List;
@@ -11,26 +10,51 @@ public class DocumentWithTextPages {
     public String id;
 
     public String name;
+    public String vendor;
+    public List<String> model;
+    public List<Integer> year;
+    public List<String> options;
     public List<Page> bookmarks;
     public List<Page> pages;
-    public List<Info> options;
-
-
-    public List<Info> getOptions() {
-        return options;
-    }
-
-    public void setOptions(List<Info> options) {
-        this.options = options;
-    }
 
     public DocumentWithTextPages(List<Page> pages, String name) {
         this.pages = pages;
         this.name = name;
     }
-
     public DocumentWithTextPages() {
 
+    }
+
+    public List<String> getOptions() {
+        return options;
+    }
+
+    public void setOptions(List<String> options) {
+        this.options = options;
+    }
+
+    public String getVendor() {
+        return vendor;
+    }
+
+    public void setVendor(String vendor) {
+        this.vendor = vendor;
+    }
+
+    public List<String> getModel() {
+        return model;
+    }
+
+    public void setModel(List<String> model) {
+        this.model = model;
+    }
+
+    public List<Integer> getYear() {
+        return year;
+    }
+
+    public void setYear(List<Integer> year) {
+        this.year = year;
     }
 
     public List<Page> getBookmarks() {
@@ -91,8 +115,6 @@ public class DocumentWithTextPages {
     public void setPages(List<Page> pages) {
         this.pages = pages;
     }
-
-
 
 
 }

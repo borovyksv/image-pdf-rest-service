@@ -1,17 +1,12 @@
 package hello.pojo;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.TextIndexed;
-
 public class Page {
-    @Id
-    public Integer id;
-    @TextIndexed
+
+    public Integer pageNum;
     public String text;
 
-    public Page(Integer id, String text) {
-
-        this.id = id;
+    public Page(Integer pageNum, String text) {
+        this.pageNum = pageNum;
         this.text = text;
     }
 
@@ -19,12 +14,12 @@ public class Page {
 
     }
 
-    public Integer getId() {
-        return id;
+    public Integer getPageNum() {
+        return pageNum;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setPageNum(Integer pageNum) {
+        this.pageNum = pageNum;
     }
 
     public String getText() {
@@ -36,3 +31,4 @@ public class Page {
     }
 
 }
+

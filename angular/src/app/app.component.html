@@ -12,7 +12,7 @@
   </div>
 </nav>
 <div class="container">
-  <form class="bootstrap-form-with-validation">
+  <form (ngSubmit)="uploadPdf()" class="bootstrap-form-with-validation">
     <h2 class="text-center">Upload document</h2>
 
 
@@ -24,27 +24,26 @@
         <div class="col-md-3" *ngFor="let selector of selectors">
           <h4 class="text-center">{{selector.title}}</h4>
           <select class="form-control" (change)="changeActiveSelectorValue(selector.title, $event.target.value)">
-            <option *ngFor="let value of selector.options"
-                    (focus)="ChangeActiveSelectorValue(selector.title, value)" >{{value}}</option>
+            <option *ngFor="let value of selector.options" >{{value}}</option>
           </select>
         </div>
       </div>
     </div>
 
-    <h3 class="text-center">Extra notes</h3>
-    <input class="form-control" type="text">
     <div class="form-group">
       <label class="control-label" for="file-input">File Input</label>
       <input type="file" name="file-input" id="file-input"
              (change)="fileChange($event)" placeholder="Upload file" accept=".pdf">
     </div>
     <div class="form-group">
-      <button class="btn btn-primary" type="submit" (click)="uploadPdf()">Upload</button>
+      <button class="btn btn-primary" type="submit">Upload</button>
     </div>
   </form>
 </div>
+
+
 <div class="container">
-  <h2 class="text-center">New selector</h2>
+  <h2 class="text-center">New selector (Administration)</h2>
   <div class="row">
     <div class="col-md-12 col-md-offset-3">
       <form (ngSubmit)="onAddSubmit()" #rawSelectorForm="ngForm" class="form-inline bootstrap-form-with-validation">
@@ -63,4 +62,7 @@
     </div>
   </div>
 </div>
+
+
+
 

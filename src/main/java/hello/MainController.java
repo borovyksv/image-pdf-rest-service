@@ -1,14 +1,13 @@
 package hello;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import hello.pojo.DocumentWithTextPages;
-import hello.pojo.Page;
+import hello.pojo.search.BookmarksDocument;
 import hello.pojo.search.SearchDocument;
-import hello.pojo.search.SearchPage;
 import hello.pojo.selectors.RawSelector;
 import hello.pojo.selectors.Selector;
 import hello.repository.DocumentWithTextPagesRepository;
 import hello.repository.SelectorRepository;
+import hello.services.DocumentService;
 import hello.services.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -26,106 +25,70 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
-@RestController
+@RestController("myController")
 public class MainController {
 
 
+    /**
+     * Search
+     */
+
+    @Autowired
+    DocumentService documentService;
+
+    @RequestMapping(value = "/{vendor}/{model}/{year}/{keyword}", method = RequestMethod.GET)
+    public List<SearchDocument> search(@PathVariable("vendor") String vendor,
+                         @PathVariable("model") String model,
+                         @PathVariable("year") Integer year,
+                         @PathVariable("keyword") String keyword,
+                           @RequestParam(value = "start", required=false, defaultValue = "0") Integer start,
+                           @RequestParam(value = "end", required=false, defaultValue = "30") Integer end){
 
 
-    /**Search*/
-    @RequestMapping(value = "/documents/{vehicle}/{keyword}", method = RequestMethod.GET)
-    public List<SearchDocument> search(@PathVariable( "vehicle" ) String vehicle, @PathVariable( "keyword" ) String keyword) throws JsonProcessingException {
+        Instant begin = Instant.now();
 
-        Instant start = Instant.now();
+        List<DocumentWithTextPages> searchQueryResults = documentWithTextPagesRepository.search(vendor, model, year, keyword);
+//
+        Instant finish = Instant.now();
+        System.out.println("search"+Duration.between(begin, finish));
 
-        List<DocumentWithTextPages> search = documentWithTextPagesRepository.search(vehicle.toUpperCase(), keyword);
+        System.out.println(searchQueryResults);
 
-        Instant end = Instant.now();
-        System.out.println("QUERY DOCUMENTS TIME: "+ Duration.between(start, end));
+        begin = Instant.now();
+        List<SearchDocument> formattedResults = documentService.getFormattedResults(keyword, start, end, searchQueryResults);
+        finish = Instant.now();
+        System.out.println("filter"+Duration.between(begin, finish));
 
+        return formattedResults;
 
-
-        return getSearchDocuments(keyword, search);
     }
 
-    private List<SearchDocument> getSearchDocuments(String keyword, List<DocumentWithTextPages> search) {
-        Instant start;
-        Instant end;
-        List<SearchDocument> result = new ArrayList<>();
 
 
-        start = Instant.now();
 
-        for (DocumentWithTextPages documentWithTextPages : search) {
-            SearchDocument document = new SearchDocument();
-            document.setName(documentWithTextPages.getName());
-            document.setOptions(documentWithTextPages.getOptions());
+//    @RequestMapping(value = "/documents/{vehicle}/{keyword}", method = RequestMethod.GET)
+//    public List<SearchDocument> searchVehicle(@PathVariable("vehicle") String vehicle, @PathVariable("keyword") String keyword) {
+//
+//        List<DocumentWithTextPages> searchQueryResults = documentWithTextPagesRepository.search(vehicle, keyword);
+//
+//        return documentService.getFormattedResults(keyword, searchQueryResults);
+//    }
 
-            List<Page> bookmarks = documentWithTextPages.getBookmarks();
-            List<SearchPage> newBookmarks = filterList(bookmarks, keyword);
-            document.setBookmarks(newBookmarks);
+    @RequestMapping(value = "/bookmarks/{vehicle}", method = RequestMethod.GET)
+    public List<BookmarksDocument> bookmarks(@PathVariable("vehicle") String vehicle) {
+        System.out.println("bookmarks");
 
-            List<Page> pages = documentWithTextPages.getPages();
-            List<SearchPage> newPages = filterList(pages, keyword);
-            document.setPages(newPages);
+        List<DocumentWithTextPages> documents = documentWithTextPagesRepository.getDocsByVehicle(vehicle);
 
-            document.setMatches(countMatches(newBookmarks, newPages));
+        return documentService.getBookmarksDocuments(documents);
 
-//            System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(document));
-
-            result.add(document);
-        }
-
-        end = Instant.now();
-
-        System.out.println("FILTERING DOCUMENTS TIME: "+ Duration.between(start, end));
-        return result;
     }
 
-    private Integer countMatches(List<SearchPage> newBookmarks, List<SearchPage> newPages) {
-        final Integer[] result = {0};
 
-        newBookmarks.forEach(page -> result[0] +=page.getMatches());
-        newPages.forEach(page -> result[0] +=page.getMatches());
 
-        return result[0];
-    }
-
-    private List<SearchPage> filterList(List<Page> pages, String keyword) {
-        return pages.parallelStream().filter(page -> page.getText().toLowerCase().contains(keyword.toLowerCase())).map(page -> {
-
-            String text = page.getText().toLowerCase();
-            String lowerKeyword = keyword.toLowerCase();
-
-            int index = text.indexOf(lowerKeyword);
-            int startPos = (index - 20) < 0 ? 0 : (index - 20);
-            int endPos = (index + keyword.length() + 20) > text.length() ? text.length() : (index + keyword.length() + 20);
-            String substring = page.getText().substring(startPos, endPos);
-
-            int counter = 1;
-            index = index + keyword.length();
-            int length = text.length();
-            while (index < length) {
-                index = text.indexOf(lowerKeyword, index+keyword.length());
-                if (index==-1){
-                    break;
-                }
-                counter++;
-            }
-
-            SearchPage result = new SearchPage();
-            result.setPageNum(page.getId());
-            result.setMatches(counter);
-            result.setText(substring);
-
-            return result;
-        }).sorted((p1, p2) -> Integer.compare(p2.getMatches(), p1.getMatches())).collect(Collectors.toList());
-    }
 
 
 
@@ -138,8 +101,7 @@ public class MainController {
 
 //    @RequestMapping(value = "/documents/store", method = RequestMethod.POST, consumes = "multipart/form-data")
 //    public Info handleFileUpload(@RequestPart("file") MultipartFile file, @RequestPart("info") List<Info> info) {
-//        System.out.println(file.getName()+"\n\n\n\n\n\n");
-//        System.out.println("INFO to string "+ info +"\n\n\n\n\n\n");
+//
 //
 //        DocumentWithTextPages saved = documentWithTextPagesRepository.save(new DocumentWithTextPages(info));
 //        String id = saved.getId();
@@ -177,8 +139,8 @@ public class MainController {
 
 
     /**
-     * Next two methods for Angular images and pdf view
-     * **/
+     * Methods for Angular images and pdf view
+     * */
 
     @RequestMapping(value = "/image/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] getImage(@PathVariable("id") Integer id) throws IOException {
