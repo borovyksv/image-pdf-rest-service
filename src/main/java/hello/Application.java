@@ -16,9 +16,7 @@ import javax.servlet.MultipartConfigElement;
 import java.util.Properties;
 
 @SpringBootApplication
-@
-
-        EnableCaching
+@EnableCaching
 public class Application {
 
 

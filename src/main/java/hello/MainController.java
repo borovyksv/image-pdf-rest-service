@@ -23,8 +23,6 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,7 +37,7 @@ public class MainController {
     @Autowired
     DocumentService documentService;
 
-    @RequestMapping(value = "/{vendor}/{model}/{year}/{keyword}", method = RequestMethod.GET)
+    @RequestMapping(value = "documents/{vendor}/{model}/{year}/{keyword}", method = RequestMethod.GET)
     public List<SearchDocument> search(@PathVariable("vendor") String vendor,
                          @PathVariable("model") String model,
                          @PathVariable("year") Integer year,
@@ -47,20 +45,9 @@ public class MainController {
                            @RequestParam(value = "start", required=false, defaultValue = "0") Integer start,
                            @RequestParam(value = "end", required=false, defaultValue = "30") Integer end){
 
-
-        Instant begin = Instant.now();
-
         List<DocumentWithTextPages> searchQueryResults = documentWithTextPagesRepository.search(vendor, model, year, keyword);
-//
-        Instant finish = Instant.now();
-        System.out.println("search"+Duration.between(begin, finish));
 
-        System.out.println(searchQueryResults);
-
-        begin = Instant.now();
         List<SearchDocument> formattedResults = documentService.getFormattedResults(keyword, start, end, searchQueryResults);
-        finish = Instant.now();
-        System.out.println("filter"+Duration.between(begin, finish));
 
         return formattedResults;
 
@@ -77,11 +64,13 @@ public class MainController {
 //        return documentService.getFormattedResults(keyword, searchQueryResults);
 //    }
 
-    @RequestMapping(value = "/bookmarks/{vehicle}", method = RequestMethod.GET)
-    public List<BookmarksDocument> bookmarks(@PathVariable("vehicle") String vehicle) {
+    @RequestMapping(value = "/bookmarks/{vendor}/{model}/{year}", method = RequestMethod.GET)
+    public List<BookmarksDocument> bookmarks(@PathVariable("vendor") String vendor,
+                                             @PathVariable("model") String model,
+                                             @PathVariable("year") Integer year) {
         System.out.println("bookmarks");
 
-        List<DocumentWithTextPages> documents = documentWithTextPagesRepository.getDocsByVehicle(vehicle);
+        List<DocumentWithTextPages> documents = documentWithTextPagesRepository.findBookmarks(vendor, model, year);
 
         return documentService.getBookmarksDocuments(documents);
 

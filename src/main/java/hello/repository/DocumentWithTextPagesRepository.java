@@ -20,7 +20,7 @@ public interface DocumentWithTextPagesRepository extends MongoRepository<Documen
     DocumentWithTextPages getSavana();
 
 
-    @Query("{'options.options':?0}, {'_id':0, 'name':1, 'bookmarks':1, 'options':1}")
-    List<DocumentWithTextPages> getDocsByVehicle(String vehicle);
+    @Query("{'vendor':?0, 'model':?1, 'year':?2}, {'_id':0, '_class':0, 'pages':0}")
+    List<DocumentWithTextPages> findBookmarks(String vendor, String vehicle, Integer year);
 
 }

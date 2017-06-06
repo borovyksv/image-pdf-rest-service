@@ -150,7 +150,7 @@ public class GreetingControllerTests {
 //            for (int i = 0; i < 300; i++) {
 //                DocumentWithTextPages document = new DocumentWithTextPages();
 //                document.setName(documentWithTextPages.getName() + " " + i);
-//                document.setBookmarks(documentWithTextPages.getDocsByVehicle());
+//                document.setBookmarks(documentWithTextPages.findBookmarks());
 //                document.setOptions(documentWithTextPages.getOptions());
 //
 //                List<Page> pages = documentWithTextPages.getPages();
