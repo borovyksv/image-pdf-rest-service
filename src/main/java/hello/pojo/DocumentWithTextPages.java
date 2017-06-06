@@ -6,7 +6,7 @@ import java.util.List;
 
 public class DocumentWithTextPages {
 
-    @Id
+
     public String id;
 
     public String name;

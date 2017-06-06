@@ -33,7 +33,7 @@ public class DocumentService {
 
         return search.parallelStream().map(doc -> {
             SearchDocument result = new SearchDocument();
-            result.setId(doc.getId());
+            result.setFolder(doc.getFolder());
             result.setName(doc.getName());
             result.setVendor(doc.getVendor());
             result.setModel(doc.getModel());

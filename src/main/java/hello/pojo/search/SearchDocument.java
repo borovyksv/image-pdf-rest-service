@@ -4,8 +4,17 @@ import java.util.List;
 
 public class SearchDocument {
 
-    public String id;
     public String name;
+    public String folder;
+
+    public String getFolder() {
+        return folder;
+    }
+
+    public void setFolder(String folder) {
+        this.folder = folder;
+    }
+
     public Integer matches;
     public String vendor;
     public List<String> model;
@@ -16,13 +25,6 @@ public class SearchDocument {
     public SearchDocument() {
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;

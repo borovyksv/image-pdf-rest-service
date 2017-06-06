@@ -16,7 +16,7 @@ import javax.servlet.MultipartConfigElement;
 import java.util.Properties;
 
 @SpringBootApplication
-@EnableCaching
+
 public class Application {
 
 
@@ -36,36 +36,6 @@ public class Application {
 
 
         return mapping;
-    }
-
-
-    @Bean(name = "commonsMultipartResolver")
-    public MultipartResolver multipartResolver() {
-        return new StandardServletMultipartResolver();
-    }
-
-
-    @Bean
-    public MultipartConfigElement multipartConfigElement() {
-        MultipartConfigFactory factory = new MultipartConfigFactory();
-
-        factory.setMaxFileSize("500MB");
-        factory.setMaxRequestSize("500MB");
-
-        return factory.createMultipartConfig();
-    }
-
-    @Bean
-    public CorsFilter corsFilter() {
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
     }
 
 }
