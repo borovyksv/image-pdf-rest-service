@@ -111,22 +111,6 @@ public class GreetingControllerTests {
     }
 
 
-    @Test
-    public void savana(){
-        DocumentWithTextPages savana = documentWithTextPagesRepository.getSavana();
-        for (int i = 500; i < 1500; i++) {
-            DocumentWithTextPages doc = new DocumentWithTextPages();
-            doc.setName(savana.getName()+" "+i);
-            doc.setOptions(savana.getOptions());
-            doc.setBookmarks(savana.getBookmarks());
-            doc.setPages(savana.getPages());
-            System.out.println(doc);
-            System.out.println("count "+documentWithTextPagesRepository.count());
-            documentWithTextPagesRepository.save(doc);
-        }
-        System.out.println(savana);
-    }
-
 
     @Test
     public void test(){

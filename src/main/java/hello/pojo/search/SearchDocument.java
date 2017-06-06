@@ -4,17 +4,24 @@ import java.util.List;
 
 public class SearchDocument {
 
+    public String id;
     public String name;
     public Integer matches;
-
     public String vendor;
     public List<String> model;
     public List<Integer> year;
     public List<String> options;
     public List<SearchPage> bookmarks;
     public List<SearchPage> pages;
-
     public SearchDocument() {
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {

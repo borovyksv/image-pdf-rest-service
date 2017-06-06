@@ -16,11 +16,10 @@ public interface DocumentWithTextPagesRepository extends MongoRepository<Documen
     @Query("{'options.options':?0, 'pages.text':{$regex:?1,$options:'i'}}")
     List<DocumentWithTextPages> search(String vehicle, String keyword);
 
-    @Query("{\"options.options\":\"Savana\"}")
-    DocumentWithTextPages getSavana();
 
-
-    @Query("{'vendor':?0, 'model':?1, 'year':?2}, {'_id':0, '_class':0, 'pages':0}")
+    @Query("{'vendor':?0, 'model':?1, 'year':?2}, {'_id':0, '_class':0, 'folder':'0', 'pages':0}")
     List<DocumentWithTextPages> findBookmarks(String vendor, String vehicle, Integer year);
 
+    @Cacheable("ids")
+    DocumentWithTextPages findById(String id);
 }

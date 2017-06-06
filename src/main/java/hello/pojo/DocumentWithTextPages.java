@@ -10,6 +10,7 @@ public class DocumentWithTextPages {
     public String id;
 
     public String name;
+    public String folder;
     public String vendor;
     public List<String> model;
     public List<Integer> year;
@@ -17,12 +18,21 @@ public class DocumentWithTextPages {
     public List<Page> bookmarks;
     public List<Page> pages;
 
+
     public DocumentWithTextPages(List<Page> pages, String name) {
         this.pages = pages;
         this.name = name;
     }
     public DocumentWithTextPages() {
 
+    }
+
+    public String getFolder() {
+        return folder;
+    }
+
+    public void setFolder(String folder) {
+        this.folder = folder;
     }
 
     public List<String> getOptions() {
